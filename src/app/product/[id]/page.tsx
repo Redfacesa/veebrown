@@ -1,24 +1,25 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, Minus, Plus, ShoppingBag, Star, Truck } from 'lucide-react';
+import { Heart, Minus, Plus, ShoppingBag, Star, Truck, Zap } from 'lucide-react';
 import type { FashionProduct } from '@/lib/types';
 import { fetchProduct, fetchProducts, fmtZar } from '@/lib/api';
 import { useCart, useWishlist } from '@/lib/store';
-import RedFacePayButtons from '@/components/RedFacePayButtons';
 import ProductGrid from '@/components/ProductGrid';
 import VeeBrownLogo from '@/components/VeeBrownLogo';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [product, setProduct] = useState<FashionProduct | null>(null);
   const [similar, setSimilar] = useState<FashionProduct[]>([]);
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const addItem = useCart((s) => s.addItem);
+  const replaceCart = useCart((s) => s.replaceCart);
   const { toggle, has } = useWishlist();
 
   useEffect(() => {
@@ -35,6 +36,11 @@ export default function ProductPage() {
   }
 
   const images = product.images?.length ? product.images : product.image_url ? [product.image_url] : [];
+
+  function handleBuyNow() {
+    replaceCart(product, { quantity: qty });
+    router.push('/cart?checkout=1');
+  }
 
   return (
     <div className="pt-20 pb-16 bg-vbrown-ivory">
@@ -126,11 +132,14 @@ export default function ProductPage() {
                 <ShoppingBag size={18} />
                 Add to bag
               </button>
-              <RedFacePayButtons
-                amount={product.price * qty}
-                label={product.name}
-                onBuyNow={() => addItem(product, { quantity: qty })}
-              />
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                className="btn-outline w-full flex items-center justify-center gap-2"
+              >
+                <Zap size={18} />
+                Buy now
+              </button>
             </div>
 
             <div className="flex items-start gap-3 text-sm text-vbrown-charcoal/55 border-t border-vbrown-charcoal/10 pt-6">

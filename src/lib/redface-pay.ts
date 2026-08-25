@@ -25,7 +25,12 @@ export function buildCheckoutUrl(opts: {
 /** Open-amount merchant pay page — use on QR posters and NFC cards. */
 export function buildMerchantPayUrl(
   merchantId: string,
-  opts?: { amountZar?: number; label?: string; returnUrl?: string },
+  opts?: {
+    amountZar?: number;
+    label?: string;
+    returnUrl?: string;
+    commerceOrderId?: string;
+  },
 ) {
   const q = new URLSearchParams({
     ecosystem_from: 'veebrown',
@@ -34,6 +39,7 @@ export function buildMerchantPayUrl(
   if (opts?.amountZar != null && opts.amountZar > 0) q.set('amount', String(Math.round(opts.amountZar)));
   if (opts?.label?.trim()) q.set('label', opts.label.trim().slice(0, 80));
   if (opts?.returnUrl) q.set('return_url', opts.returnUrl);
+  if (opts?.commerceOrderId) q.set('commerce_order_id', opts.commerceOrderId);
   const qs = q.toString();
   return `${REDFACE_PAY_URL}/pay/${merchantId}${qs ? `?${qs}` : ''}`;
 }
@@ -43,11 +49,13 @@ export function buildDirectPayUrl(opts: {
   amountZar: number;
   label: string;
   returnUrl?: string;
+  commerceOrderId?: string;
 }) {
   return buildMerchantPayUrl(opts.merchantId, {
     amountZar: opts.amountZar,
     label: opts.label,
     returnUrl: opts.returnUrl ?? SITE_URL,
+    commerceOrderId: opts.commerceOrderId,
   });
 }
 
@@ -159,5 +167,9 @@ export async function createCommerceOrder(payload: {
       }),
     },
   );
-  return res.json();
+  const data = await res.json();
+  if (!res.ok || data?.ok === false) {
+    throw new Error(String(data?.message ?? 'Could not start checkout. Please try again.'));
+  }
+  return data;
 }

@@ -1,21 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Minus, Plus, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from '@/lib/store';
 import { fmtZar } from '@/lib/api';
-import RedFacePayButtons from '@/components/RedFacePayButtons';
-import { createCommerceOrder } from '@/lib/redface-pay';
+import { buildDirectPayUrl, createCommerceOrder } from '@/lib/redface-pay';
 import ShippingSelector, { formatDeliveryAddress } from '@/components/ShippingSelector';
 import type { ShippingQuote, ShippingRegion } from '@/lib/shipping-rates';
+import { PANGOLIN_MERCHANT_ID, SITE_URL } from '@/lib/supabase';
 import VeeBrownLogo from '@/components/VeeBrownLogo';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, total, clearCart } = useCart();
+  const checkoutRef = useRef<HTMLDivElement>(null);
   const [checkingOut, setCheckingOut] = useState(false);
-  const [merchantId, setMerchantId] = useState('');
+  const [checkoutError, setCheckoutError] = useState('');
   const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
   const [deliveryMeta, setDeliveryMeta] = useState({
     region: 'za_national' as ShippingRegion,
@@ -24,23 +25,41 @@ export default function CartPage() {
     postalCode: '',
   });
 
+  const merchantId = PANGOLIN_MERCHANT_ID;
   const bottleCount = items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = total();
   const shippingZar = shippingQuote?.amountZar ?? 0;
   const orderTotal = subtotal + shippingZar;
-
-  useEffect(() => {
-    fetch('/api/config')
-      .then((r) => r.json())
-      .then((c) => setMerchantId(c.payMerchantId ?? ''));
-  }, []);
+  const orderLabel =
+    items.length === 1
+      ? items[0].product.name
+      : `VV Brown Fragrances order (${bottleCount} item${bottleCount === 1 ? '' : 's'})`;
 
   const handleShippingQuote = useCallback((quote: ShippingQuote | null) => {
     setShippingQuote(quote);
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') === '1') {
+      checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+
   async function handleCheckout() {
-    if (!merchantId || !items.length || !shippingQuote) return;
+    setCheckoutError('');
+    if (!merchantId) {
+      setCheckoutError('Checkout is not configured yet. Please contact the store.');
+      return;
+    }
+    if (!items.length) return;
+    if (!shippingQuote) {
+      setCheckoutError('Choose your delivery destination above before paying.');
+      checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
     setCheckingOut(true);
     try {
       const deliveryTo = formatDeliveryAddress(deliveryMeta);
@@ -63,9 +82,23 @@ export default function CartPage() {
           },
         ],
       });
-      if (result.checkout_url) {
-        window.location.href = result.checkout_url;
-      }
+      const orderId = String(result.order?.id ?? '');
+      window.location.href = buildDirectPayUrl({
+        merchantId,
+        amountZar: orderTotal,
+        label: orderLabel,
+        returnUrl: `${SITE_URL}/dashboard/orders`,
+        commerceOrderId: orderId || undefined,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not start checkout.';
+      setCheckoutError(message);
+      window.location.href = buildDirectPayUrl({
+        merchantId,
+        amountZar: orderTotal,
+        label: orderLabel,
+        returnUrl: `${SITE_URL}/dashboard/orders`,
+      });
     } finally {
       setCheckingOut(false);
     }
@@ -150,14 +183,14 @@ export default function CartPage() {
           />
         </div>
 
-        <div className="border border-vbrown-charcoal/10 bg-vbrown-cream p-6 space-y-3">
+        <div ref={checkoutRef} className="border border-vbrown-charcoal/10 bg-vbrown-cream p-6 space-y-3">
           <div className="flex justify-between text-sm text-vbrown-charcoal/70">
             <span>Subtotal ({bottleCount} item{bottleCount === 1 ? '' : 's'})</span>
             <span>{fmtZar(subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm text-vbrown-charcoal/70">
             <span>Delivery</span>
-            <span>{shippingQuote ? fmtZar(shippingQuote.amountZar) : '—'}</span>
+            <span>{shippingQuote ? fmtZar(shippingQuote.amountZar) : 'Choose delivery above'}</span>
           </div>
           <div className="flex justify-between text-lg text-vbrown-charcoal border-t border-vbrown-charcoal/10 pt-3">
             <span>Total</span>
@@ -166,16 +199,18 @@ export default function CartPage() {
           <button
             type="button"
             onClick={handleCheckout}
-            disabled={checkingOut || !shippingQuote}
+            disabled={checkingOut}
             className="btn-classic w-full mt-2"
           >
-            {checkingOut ? 'Redirecting to RedFace Pay...' : 'Checkout with RedFace Pay'}
+            {checkingOut ? 'Opening RedFace Pay...' : `Pay with RedFace Pay — ${fmtZar(orderTotal)}`}
           </button>
-          <RedFacePayButtons
-            amount={orderTotal}
-            label="VV Brown Fragrances order"
-            onBuyNow={handleCheckout}
-          />
+          {checkoutError ? (
+            <p className="text-xs text-red-800 text-center leading-relaxed">{checkoutError}</p>
+          ) : (
+            <p className="text-xs text-vbrown-charcoal/50 text-center leading-relaxed">
+              Confirm delivery above, then pay securely with RedFace Pay.
+            </p>
+          )}
           <p className="text-[10px] admin-muted text-center leading-relaxed">
             Shipping is an estimate based on Courier Guy (SA) and DHL (international) public rate guides. Final carrier
             is selected when your order is fulfilled.

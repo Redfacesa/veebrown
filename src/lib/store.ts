@@ -5,6 +5,7 @@ import type { CartItem, FashionProduct } from './types';
 type CartStore = {
   items: CartItem[];
   addItem: (product: FashionProduct, opts?: { size?: string; color?: string; quantity?: number }) => void;
+  replaceCart: (product: FashionProduct, opts?: { size?: string; color?: string; quantity?: number }) => void;
   removeItem: (productId: string, size?: string, color?: string) => void;
   updateQuantity: (productId: string, quantity: number, size?: string, color?: string) => void;
   clearCart: () => void;
@@ -38,6 +39,10 @@ export const useCart = create<CartStore>()(
           }
           return { items: [...state.items, { product, quantity, size, color }] };
         });
+      },
+      replaceCart: (product, opts) => {
+        const { size, color, quantity = 1 } = opts ?? {};
+        set({ items: [{ product, quantity, size, color }] });
       },
       removeItem: (productId, size, color) => {
         const key = cartKey(productId, size, color);
