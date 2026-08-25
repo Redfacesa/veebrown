@@ -37,4 +37,19 @@ body {
   .admin-muted {
     @apply text-vbrown-charcoal/55;
   }
+  .admin-label {
+    @apply block text-[10px] tracking-[0.25em] uppercase text-vbrown-charcoal/50 mb-2;
+  }
+  .admin-input {
+    @apply w-full border border-vbrown-charcoal/15 bg-white px-4 py-3 text-sm text-vbrown-charcoal outline-none focus:border-vbrown-gold;
+  }
+  .btn-admin-solid {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 text-xs tracking-[0.12em] uppercase bg-vbrown-charcoal text-vbrown-cream border border-vbrown-charcoal hover:bg-vbrown-ink transition-colors disabled:opacity-50;
+  }
+  .btn-admin-outline {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 text-xs tracking-[0.12em] uppercase border border-vbrown-charcoal/20 text-vbrown-charcoal bg-vbrown-cream hover:border-vbrown-gold hover:text-vbrown-gold transition-colors disabled:opacity-50;
+  }
+  .btn-admin-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 min-h-10 text-xs uppercase text-vbrown-charcoal/60 hover:text-vbrown-charcoal border border-transparent hover:border-vbrown-charcoal/15 transition-colors;
+  }
 }

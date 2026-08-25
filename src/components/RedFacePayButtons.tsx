@@ -13,7 +13,6 @@ type Props = {
 };
 
 const METHODS = [
-  { id: 'card', icon: CreditCard, label: 'Pay with RedFace Pay' },
   { id: 'qr', icon: QrCode, label: 'QR Pay' },
   { id: 'tap', icon: Smartphone, label: 'Tap to Pay' },
   { id: 'wallet', icon: Wallet, label: 'Wallet' },
@@ -27,38 +26,46 @@ export default function RedFacePayButtons({ amount, label, onBuyNow, className =
 
   return (
     <div className={`space-y-3 ${className}`}>
-      <button type="button" onClick={onBuyNow} className="btn-primary w-full text-lg">
-        <Zap size={20} />
-        Buy Now — {fmtZar(amount)}
+      <button
+        type="button"
+        onClick={onBuyNow}
+        className="btn-classic w-full flex items-center justify-center gap-2 text-sm"
+      >
+        <Zap size={18} className="text-vbrown-cream" strokeWidth={1.75} />
+        Buy now — {fmtZar(amount)}
       </button>
 
       <a
         href={payUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="btn-secondary w-full flex"
+        className="btn-outline w-full flex items-center justify-center gap-2 text-sm"
       >
-        <CreditCard size={18} />
+        <CreditCard size={18} className="text-vbrown-charcoal" strokeWidth={1.75} />
         Pay with RedFace Pay
       </a>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-        {METHODS.slice(1).map((m) => (
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+        {METHODS.map((m) => (
           <a
             key={m.id}
             href={payUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl glass text-xs text-white/60 hover:text-vbrown-gold hover:border-vbrown-gold/30 transition-all"
+            className="group flex flex-col items-center justify-center gap-2 p-3 min-h-[88px] bg-vbrown-cream border border-vbrown-charcoal/12 text-[10px] tracking-[0.12em] uppercase text-vbrown-charcoal/70 hover:border-vbrown-gold hover:bg-white transition-all duration-300"
           >
-            <m.icon size={20} />
-            {m.label}
+            <m.icon
+              size={22}
+              className="text-black group-hover:text-vbrown-charcoal transition-colors"
+              strokeWidth={1.5}
+            />
+            <span className="text-center leading-tight group-hover:text-vbrown-charcoal">{m.label}</span>
           </a>
         ))}
       </div>
 
       {!PANGOLIN_MERCHANT_ID && (
-        <p className="text-xs text-amber-400/80 text-center">
+        <p className="text-xs text-amber-800/80 text-center">
           Set NEXT_PUBLIC_VEEBROWN_MERCHANT_ID to enable RedFace Pay checkout.
         </p>
       )}
