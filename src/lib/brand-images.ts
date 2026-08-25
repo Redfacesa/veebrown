@@ -1,0 +1,8 @@
+/** Static brand photography (VV Brown Fragrances). */
+export const BRAND_IMAGES = {
+  hero: '/brand/hero-madame.png',
+  editorialFemme: '/brand/editorial-femme.png',
+  editorialFemmeAlt: '/brand/editorial-femme-alt.png',
+  editorialBaron: '/brand/editorial-baron.png',
+  logo: '/brand/logo.png',
+} as const;

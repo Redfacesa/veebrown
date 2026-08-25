@@ -28,4 +28,10 @@ body {
   .section-padding {
     @apply px-4 sm:px-6 lg:px-10 max-w-6xl mx-auto;
   }
+  .admin-card {
+    @apply bg-vbrown-cream border border-vbrown-charcoal/10;
+  }
+  .admin-muted {
+    @apply text-vbrown-charcoal/55;
+  }
 }

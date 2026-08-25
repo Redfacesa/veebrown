@@ -19,32 +19,41 @@ export type VeeBrownPlatformConfig = {
 
 const MERCHANT_ID = '44ea657f-217c-4700-9441-ad391a13e354';
 
+/** Owner + platform ops — same RedFace Pay login works for /admin */
+export const VEEBROWN_ADMIN_EMAILS = [
+  'valenciakabasele@gmail.com',
+  'info@redfacepay.co.za',
+  'redfacesa@gmail.com',
+];
+
 const FALLBACK: VeeBrownPlatformConfig = {
   slug: 'veebrown',
   name: 'VV Brown Fragrances',
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://veebrown.vercel.app',
   domains: ['veebrown.vercel.app', 'localhost', '127.0.0.1'],
   payMerchantId: process.env.NEXT_PUBLIC_VEEBROWN_MERCHANT_ID ?? MERCHANT_ID,
-  adminEmails: ['valenciakabasele@gmail.com', 'redfacesa@gmail.com', 'info@redfacepay.co.za'],
+  adminEmails: VEEBROWN_ADMIN_EMAILS,
 };
 
 let cached: VeeBrownPlatformConfig | null = null;
 
 export async function getVeeBrownConfig(): Promise<VeeBrownPlatformConfig> {
-  if (cached?.payMerchantId) return cached;
+  if (cached) return cached;
 
-  const envMerchantId = process.env.NEXT_PUBLIC_VEEBROWN_MERCHANT_ID ?? '';
-  if (envMerchantId) {
+  const envMerchantId = process.env.NEXT_PUBLIC_VEEBROWN_MERCHANT_ID ?? MERCHANT_ID;
+  const supabase = getSupabase();
+
+  if (!supabase) {
     cached = { ...FALLBACK, payMerchantId: envMerchantId };
     return cached;
   }
 
-  const supabase = getSupabase();
-  if (!supabase) return FALLBACK;
-
   try {
     const { data, error } = await supabase.rpc('get_ecosystem_app_config', { p_slug: 'veebrown' });
-    if (error || !data?.ok) return FALLBACK;
+    if (error || !data?.ok) {
+      cached = { ...FALLBACK, payMerchantId: envMerchantId };
+      return cached;
+    }
 
     const adminEmails = Array.isArray(data.admin_emails)
       ? (data.admin_emails as string[])
@@ -55,13 +64,14 @@ export async function getVeeBrownConfig(): Promise<VeeBrownPlatformConfig> {
       name: String(data.name ?? FALLBACK.name),
       siteUrl: String(data.site_url ?? FALLBACK.siteUrl),
       domains: Array.isArray(data.domains) ? (data.domains as string[]) : FALLBACK.domains,
-      payMerchantId: String(data.pay_merchant_id ?? MERCHANT_ID),
+      payMerchantId: String(data.pay_merchant_id ?? envMerchantId),
       adminEmails,
       merchant: data.merchant as VeeBrownPlatformConfig['merchant'],
     };
     return cached;
   } catch {
-    return FALLBACK;
+    cached = { ...FALLBACK, payMerchantId: envMerchantId };
+    return cached;
   }
 }
 

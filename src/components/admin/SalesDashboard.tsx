@@ -31,14 +31,14 @@ function StatCard({
   accent?: boolean;
 }) {
   return (
-    <div className={`glass rounded-xl p-3.5 sm:p-5 ${accent ? 'border border-vbrown-gold/30' : ''}`}>
+    <div className={`admin-card rounded-none p-3.5 sm:p-5 ${accent ? 'border-vbrown-gold/40' : ''}`}>
       <div className="flex items-start justify-between gap-2 sm:gap-3">
         <div className="min-w-0">
-          <p className="text-white/50 text-xs sm:text-sm">{label}</p>
-          <p className={`text-lg sm:text-2xl font-bold mt-1 truncate ${accent ? 'text-vbrown-gold' : ''}`}>{value}</p>
-          {hint && <p className="text-xs text-white/35 mt-1 line-clamp-2">{hint}</p>}
+          <p className="admin-muted text-xs sm:text-sm">{label}</p>
+          <p className={`text-lg sm:text-2xl font-display mt-1 truncate ${accent ? 'text-vbrown-gold' : 'text-vbrown-charcoal'}`}>{value}</p>
+          {hint && <p className="text-xs admin-muted mt-1 line-clamp-2">{hint}</p>}
         </div>
-        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-vbrown-gold/10 flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 border border-vbrown-charcoal/10 flex items-center justify-center shrink-0">
           <Icon size={18} className="text-vbrown-gold" />
         </div>
       </div>
@@ -91,14 +91,14 @@ export default function SalesDashboard({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold">{compact ? 'Today at a glance' : 'Sales & stock'}</h2>
+          <h2 className="font-display text-xl text-vbrown-charcoal">{compact ? 'Today at a glance' : 'Sales & stock'}</h2>
           {!compact && (
-            <p className="text-sm text-white/50 mt-1">
-              Card, online, and in-store cash sales — synced with RedFace Pay POS.
+            <p className="text-sm admin-muted mt-1">
+              Fragrance sales from your website, card checkout, and in-store counter.
             </p>
           )}
         </div>
-        <button type="button" onClick={() => void reload()} className="btn-secondary text-sm" disabled={loading}>
+        <button type="button" onClick={() => void reload()} className="btn-outline text-sm" disabled={loading}>
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           Refresh
         </button>
@@ -106,7 +106,7 @@ export default function SalesDashboard({
 
       {error && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-          Could not load sales data. Sign in with your RedFace Pay merchant account (SSO) if you only use Pangolin admin password.
+          Could not load sales data. Sign in with your RedFace Pay merchant account (same password as this admin login).
         </div>
       )}
 
@@ -138,27 +138,27 @@ export default function SalesDashboard({
 
       {!compact && (
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="glass rounded-xl p-5">
+          <div className="admin-card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Recent sales</h3>
-              <span className="text-xs text-white/40">What customers bought</span>
+              <h3 className="font-display text-lg">Recent sales</h3>
+              <span className="text-xs admin-muted">What customers bought</span>
             </div>
             {loading && !sales.length ? (
-              <p className="text-white/40 text-sm">Loading sales…</p>
+              <p className="admin-muted text-sm">Loading sales…</p>
             ) : sales.length === 0 ? (
-              <p className="text-white/40 text-sm">No sales yet today. Use the POS tab to record a cash sale.</p>
+              <p className="admin-muted text-sm">No sales yet. They will appear here once customers checkout.</p>
             ) : (
               <ul className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
                 {sales.map((row) => (
-                  <li key={row.id} className="rounded-lg bg-black/20 px-3 py-3">
+                  <li key={row.id} className="border border-vbrown-charcoal/8 bg-white px-3 py-3">
                     <div className="flex justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{formatLineItemsSummary(row.line_items)}</p>
-                        <p className="text-xs text-white/40 mt-0.5">
+                        <p className="font-medium text-sm truncate text-vbrown-charcoal">{formatLineItemsSummary(row.line_items)}</p>
+                        <p className="text-xs admin-muted mt-0.5">
                           {row.customer} · {paymentMethodLabel(row.payment_method)} · {formatSoldAt(row.sold_at)}
                         </p>
                       </div>
-                      <span className="text-vbrown-gold font-semibold shrink-0">{fmtZar(row.amount)}</span>
+                      <span className="text-vbrown-gold font-display shrink-0">{fmtZar(row.amount)}</span>
                     </div>
                   </li>
                 ))}
@@ -166,10 +166,10 @@ export default function SalesDashboard({
             )}
           </div>
 
-          <div className="glass rounded-xl p-5">
+          <div className="admin-card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Stock on hand</h3>
-              <span className="text-xs text-white/40">Units left per product</span>
+              <h3 className="font-display text-lg">Stock on hand</h3>
+              <span className="text-xs admin-muted">Units per fragrance</span>
             </div>
             {lowStock.length > 0 && (
               <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 flex items-start gap-2 text-sm">
@@ -184,17 +184,17 @@ export default function SalesDashboard({
             ) : (
               <ul className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
                 {inventory.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between gap-3 rounded-lg bg-black/20 px-3 py-2.5 text-sm">
+                  <li key={p.id} className="flex items-center justify-between gap-3 border border-vbrown-charcoal/8 bg-white px-3 py-2.5 text-sm">
                     <div className="min-w-0">
-                      <p className="truncate">{p.name}</p>
-                      {p.category && <p className="text-xs text-white/35">{p.category}</p>}
+                      <p className="truncate text-vbrown-charcoal">{p.name}</p>
+                      {p.category && <p className="text-xs admin-muted">{p.category}</p>}
                     </div>
                     <div className="text-right shrink-0">
-                      <p className={`font-semibold ${isLowStock(p) ? 'text-amber-400' : 'text-white'}`}>
+                      <p className={`font-semibold ${isLowStock(p) ? 'text-amber-700' : 'text-vbrown-charcoal'}`}>
                         {p.track_inventory && p.stock_quantity != null ? p.stock_quantity : '—'}
                       </p>
                       {p.stock_sold > 0 && (
-                        <p className="text-xs text-white/35">{p.stock_sold} sold</p>
+                        <p className="text-xs admin-muted">{p.stock_sold} sold</p>
                       )}
                     </div>
                   </li>

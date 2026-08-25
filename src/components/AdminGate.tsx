@@ -14,6 +14,7 @@ import {
 } from '@/lib/admin-auth';
 import type { VeeBrownPlatformConfig } from '@/lib/platform-config';
 import { getSupabase } from '@/lib/supabase';
+import VeeBrownLogo from '@/components/VeeBrownLogo';
 
 export default function AdminGate({
   config,
@@ -24,7 +25,7 @@ export default function AdminGate({
 }) {
   const [session, setSession] = useState<AdminSession | null>(null);
   const [ready, setReady] = useState(false);
-  const [email, setEmail] = useState(config.adminEmails[0] ?? 'redfacesa@gmail.com');
+  const [email, setEmail] = useState('valenciakabasele@gmail.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -38,9 +39,9 @@ export default function AdminGate({
       await applySsoTokensFromUrl();
       const current = await readAdminSession();
       setSession(current);
+      if (current?.email) setEmail(current.email);
       setReady(true);
 
-      // Drop stale admin UI when refresh token fails / session expires.
       if (supabase) {
         const { data } = supabase.auth.onAuthStateChange((_event, next) => {
           if (!next?.user?.email) {
@@ -66,14 +67,14 @@ export default function AdminGate({
       const next = await signInAdmin(email, password);
       if (!isAllowedAdmin(next, config)) {
         await signOutAdmin();
-        setError('This account is not authorised for VV Brown Fragrances admin.');
+        setError('This email is not authorised for VV Brown admin. Use valenciakabasele@gmail.com or info@redfacepay.co.za.');
         setSession(null);
         return;
       }
       setSession(next);
       setPassword('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign-in failed');
+      setError(err instanceof Error ? err.message : 'Sign-in failed. Use the same password as RedFace Pay.');
     } finally {
       setBusy(false);
     }
@@ -85,23 +86,25 @@ export default function AdminGate({
   }
 
   if (!ready) {
-    return <div className="pt-32 section-padding text-white/40">Loading admin...</div>;
+    return <div className="pt-32 section-padding admin-muted">Loading admin...</div>;
   }
 
   if (!allowed) {
     return (
-      <div className="pt-32 pb-16 section-padding max-w-lg mx-auto">
-        <div className="text-center mb-8">
-          <Shield size={48} className="mx-auto mb-6 text-vbrown-gold" />
-          <h1 className="font-display text-3xl mb-4">VV Brown Fragrances Admin</h1>
-          <p className="text-white/50 text-sm">
-            Sign in with your RedFace Pay password. Only approved admin emails can access this panel.
+      <div className="pt-24 pb-16 section-padding max-w-md mx-auto bg-vbrown-ivory min-h-[70vh]">
+        <div className="text-center mb-10">
+          <VeeBrownLogo href="/" size="footer" className="mx-auto mb-8" />
+          <Shield size={32} className="mx-auto mb-4 text-vbrown-gold" />
+          <h1 className="font-display text-2xl text-vbrown-charcoal mb-3">Merchant admin</h1>
+          <p className="admin-muted text-sm leading-relaxed">
+            Sign in with the <strong className="text-vbrown-charcoal font-normal">same email and password</strong> you
+            use on RedFace Pay. One login for your merchant account and this storefront.
           </p>
         </div>
 
-        <form onSubmit={onSubmit} className="glass rounded-2xl p-6 space-y-4">
+        <form onSubmit={onSubmit} className="admin-card p-6 space-y-4">
           <div>
-            <label htmlFor="admin-email" className="block text-xs font-semibold uppercase tracking-wide text-white/40 mb-2">
+            <label htmlFor="admin-email" className="block text-[10px] tracking-[0.25em] uppercase admin-muted mb-2">
               Email
             </label>
             <input
@@ -110,13 +113,13 @@ export default function AdminGate({
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-vbrown-gold/50"
+              className="w-full border border-vbrown-charcoal/15 bg-white px-4 py-3 text-sm text-vbrown-charcoal outline-none focus:border-vbrown-gold"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="admin-password" className="block text-xs font-semibold uppercase tracking-wide text-white/40 mb-2">
+            <label htmlFor="admin-password" className="block text-[10px] tracking-[0.25em] uppercase admin-muted mb-2">
               Password
             </label>
             <div className="relative">
@@ -126,13 +129,13 @@ export default function AdminGate({
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 pr-12 text-sm text-white outline-none focus:border-vbrown-gold/50"
+                className="w-full border border-vbrown-charcoal/15 bg-white px-4 py-3 pr-12 text-sm text-vbrown-charcoal outline-none focus:border-vbrown-gold"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 admin-muted hover:text-vbrown-charcoal"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -140,34 +143,28 @@ export default function AdminGate({
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-700">{error}</p>}
 
-          <button type="submit" disabled={busy} className="btn-primary w-full justify-center">
-            <LogIn size={18} />
-            {busy ? 'Signing in…' : 'Sign in with password'}
+          <button type="submit" disabled={busy} className="btn-classic w-full justify-center gap-2">
+            <LogIn size={16} />
+            {busy ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <a href={buildSsoLoginUrl('/admin')} className="text-sm text-vbrown-gold hover:underline">
-            Or continue via RedFace Pay SSO
+            Continue via RedFace Pay SSO
           </a>
         </div>
 
-        <p className="text-xs text-white/30 mt-6 text-center">
-          Linked merchant: {config.merchant?.business_name ?? 'VV Brown Fragrances'}
-          {config.payMerchantId && (
-            <>
-              <br />
-              <span className="font-mono">{config.payMerchantId}</span>
-            </>
-          )}
+        <p className="text-xs admin-muted mt-8 text-center leading-relaxed">
+          Approved admins: valenciakabasele@gmail.com, info@redfacepay.co.za
           <br />
-          Add products here in Admin → Products, or in RedFace Pay — same catalog, both stay in sync.
+          Manage fragrances, sales, inventory, and delivery from this panel.
         </p>
 
-        <Link href="/" className="block mt-6 text-center text-sm text-white/40 hover:text-white">
-          ← Back to store
+        <Link href="/" className="block mt-6 text-center text-sm admin-muted hover:text-vbrown-gold">
+          Back to store
         </Link>
       </div>
     );
@@ -175,15 +172,15 @@ export default function AdminGate({
 
   return (
     <div>
-      <div className="fixed top-[4.5rem] right-3 sm:top-20 sm:right-4 z-40 flex items-center gap-2">
+      <div className="fixed top-[4.5rem] right-3 sm:top-20 sm:right-4 z-40">
         <button
           type="button"
           onClick={onSignOut}
-          className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-vbrown-black/80 backdrop-blur-md text-white text-xs py-2.5 px-3 min-h-10 touch-manipulation hover:bg-white/10"
+          className="inline-flex items-center gap-2 border border-vbrown-charcoal/15 bg-vbrown-cream/95 text-vbrown-charcoal text-xs py-2 px-3 min-h-10 hover:border-vbrown-gold"
           aria-label={`Sign out${session?.email ? ` (${session.email})` : ''}`}
         >
           <LogOut size={14} />
-          <span className="hidden sm:inline">Sign out</span>
+          <span className="hidden sm:inline max-w-[140px] truncate">{session?.email ?? 'Sign out'}</span>
         </button>
       </div>
       {children}
