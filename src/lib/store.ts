@@ -61,7 +61,7 @@ export const useCart = create<CartStore>()(
       total: () => get().items.reduce((s, i) => s + i.product.price * i.quantity, 0),
       itemCount: () => get().items.reduce((s, i) => s + i.quantity, 0),
     }),
-    { name: 'pangolin-cart' },
+    { name: 'veebrown-cart' },
   ),
 );
 
@@ -81,6 +81,6 @@ export const useWishlist = create<WishlistStore>()(
         })),
       has: (id) => get().ids.includes(id),
     }),
-    { name: 'pangolin-wishlist' },
+    { name: 'veebrown-wishlist' },
   ),
 );

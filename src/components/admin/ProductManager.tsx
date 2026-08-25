@@ -230,7 +230,7 @@ export default function ProductManager({ merchantId, categories }: Props) {
     const ok = window.confirm(
       isHardDelete
         ? `Permanently delete "${p.name}"?\n\nOnly works if it has no order or stock history. Prefer keeping it archived (hidden).`
-        : `Remove "${p.name}" from the storefront?\n\nIt will be hidden on Pangolin and RedFace Pay. Past orders stay intact — turn on “Show archived” to restore later.`,
+        : `Remove "${p.name}" from the storefront?\n\nIt will be hidden on the website and RedFace Pay. Past orders stay intact — turn on “Show archived” to restore later.`,
     );
     if (!ok) return;
     setBusy(true);
@@ -283,7 +283,7 @@ export default function ProductManager({ merchantId, categories }: Props) {
         <button type="button" onClick={() => setMode('list')} className="text-sm text-white/50 hover:text-white mb-4">
           ← Back to products
         </button>
-        <h2 className="text-xl font-semibold mb-2">{mode === 'add' ? 'Add clothing item' : 'Edit product'}</h2>
+        <h2 className="text-xl font-semibold mb-2">{mode === 'add' ? 'Add fragrance' : 'Edit fragrance'}</h2>
         <p className="text-sm text-white/40 mb-6">
           Category, photos, sizes and colours sync with RedFace Pay merchant portal.
         </p>
@@ -509,7 +509,7 @@ export default function ProductManager({ merchantId, categories }: Props) {
         <div>
           <h2 className="text-xl font-semibold">Products</h2>
           <p className="text-sm text-white/40 mt-1 max-w-xl">
-            One shared catalog with RedFace Pay. Add categories, multiple photos, sizes and colours here or in the merchant portal.
+            One shared fragrance catalog with RedFace Pay. Add products here or in the merchant portal — they appear on this website automatically.
           </p>
         </div>
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
@@ -517,11 +517,8 @@ export default function ProductManager({ merchantId, categories }: Props) {
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Refresh
           </button>
-          <button type="button" onClick={() => void onImportDemo()} className="btn-secondary text-sm min-h-11 justify-center px-3" disabled={busy || !merchantId}>
-            Import starter
-          </button>
           <button type="button" onClick={openAdd} className="btn-primary text-sm min-h-11 justify-center col-span-2 sm:col-span-1">
-            <Plus size={16} /> Add product
+            <Plus size={16} /> Add fragrance
           </button>
           <a href={buildMerchantPortalUrl('products')} target="_blank" rel="noreferrer" className="btn-secondary text-sm min-h-11 justify-center col-span-2 sm:col-span-1">
             <ExternalLink size={14} /> Portal
@@ -571,7 +568,7 @@ export default function ProductManager({ merchantId, categories }: Props) {
                     {cover ? (
                       <Image src={cover} alt="" fill className="object-cover" />
                     ) : (
-                      <span className="absolute inset-0 flex items-center justify-center text-xl">👕</span>
+                      <span className="absolute inset-0 flex items-center justify-center text-xs uppercase tracking-widest text-white/30">No image</span>
                     )}
                     {imageCount > 1 && (
                       <span className="absolute bottom-0 right-0 text-[10px] bg-black/70 px-1 rounded-tl">

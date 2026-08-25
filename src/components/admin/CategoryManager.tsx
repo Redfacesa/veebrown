@@ -96,7 +96,7 @@ export default function CategoryManager({ merchantId, categories, onChange }: Pr
     <div>
       <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
         <div>
-          <h2 className="text-xl font-semibold">Clothing categories</h2>
+          <h2 className="text-xl font-semibold">Fragrance categories</h2>
           <p className="text-sm text-white/40 mt-1 max-w-xl">
             Organise your catalog — Men&apos;s, Women&apos;s, Jackets, Shoes, and more. Shared with RedFace Pay POS.
           </p>
@@ -108,7 +108,7 @@ export default function CategoryManager({ merchantId, categories, onChange }: Pr
           className="btn-secondary text-sm"
         >
           <RefreshCw size={14} className={busy ? 'animate-spin' : ''} />
-          Load fashion defaults
+          Load fragrance defaults
         </button>
       </div>
 
@@ -143,7 +143,7 @@ export default function CategoryManager({ merchantId, categories, onChange }: Pr
         <div className="glass rounded-xl p-8 text-center text-white/40">
           <p>No categories yet.</p>
           <button type="button" onClick={() => void onSeedDefaults()} className="btn-primary text-sm mt-4">
-            Load default fashion categories
+            Load default fragrance categories
           </button>
         </div>
       ) : (

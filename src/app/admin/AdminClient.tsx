@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Package,
-  Scissors,
   LayoutGrid,
   Image as ImageIcon,
   BarChart3,
@@ -15,9 +14,9 @@ import {
   Store,
 } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
-import { fetchCategories, fetchProducts, fetchTailoringServices, fmtZar } from '@/lib/api';
-import type { FashionProduct, Category, TailoringService } from '@/lib/types';
-import { DEFAULT_CATEGORIES, DEFAULT_TAILORING_SERVICES } from '@/lib/types';
+import { fetchCategories, fetchProducts } from '@/lib/api';
+import type { FashionProduct, Category } from '@/lib/types';
+import { DEFAULT_CATEGORIES } from '@/lib/types';
 import type { VeeBrownPlatformConfig } from '@/lib/platform-config';
 import { getMerchantIdFromConfig } from '@/lib/platform-config';
 import ProductManager from '@/components/admin/ProductManager';
@@ -33,7 +32,6 @@ const NAV = [
   { id: 'pos', icon: Store, label: 'POS' },
   { id: 'products', icon: Package, label: 'Products' },
   { id: 'categories', icon: LayoutGrid, label: 'Categories' },
-  { id: 'tailoring', icon: Scissors, label: 'Tailoring' },
   { id: 'orders', icon: Tag, label: 'Orders' },
   { id: 'customers', icon: Users, label: 'Customers' },
   { id: 'banners', icon: ImageIcon, label: 'Banners' },
@@ -46,7 +44,6 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
   const [posRefresh, setPosRefresh] = useState(0);
   const [products, setProducts] = useState<FashionProduct[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [services, setServices] = useState<TailoringService[]>([]);
   const [merchantInfo, setMerchantInfo] = useState<Record<string, unknown> | null>(
     config.merchant ? (config.merchant as Record<string, unknown>) : null,
   );
@@ -76,7 +73,6 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
   useEffect(() => {
     fetchProducts({ merchantId, limit: 100 }).then(setProducts);
     fetchCategories(merchantId).then(setCategories);
-    fetchTailoringServices(merchantId).then(setServices);
 
     void fetch('/api/config')
       .then((r) => r.json())
@@ -109,7 +105,7 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
       <div className="section-padding">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6 sm:mb-8">
           <div className="min-w-0 pr-16 sm:pr-0">
-            <h1 className="font-display text-2xl sm:text-3xl">Pangolin Admin</h1>
+            <h1 className="font-display text-2xl sm:text-3xl">VV Brown Fragrances Admin</h1>
             <p className="text-white/50 text-xs sm:text-sm truncate">
               {config.merchant?.email ?? 'redfacesa@gmail.com'} · {config.siteUrl}
             </p>
@@ -175,11 +171,10 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
               <div className="space-y-6">
                 <SalesDashboard merchantId={merchantId} compact refreshKey={posRefresh} />
 
-                <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4">
                   {[
-                    { label: 'Products', value: products.length },
+                    { label: 'Fragrances', value: products.length },
                     { label: 'Categories', value: categories.length || DEFAULT_CATEGORIES.length },
-                    { label: 'Services', value: services.length || DEFAULT_TAILORING_SERVICES.length },
                   ].map((stat) => (
                     <div key={stat.label} className="glass rounded-xl p-3 sm:p-6">
                       <p className="text-white/50 text-xs sm:text-sm">{stat.label}</p>
@@ -209,8 +204,7 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
                     </dl>
                   ) : (
                     <p className="text-white/40 text-sm">
-                      Run migration <code className="text-vbrown-gold">0203_pangolin_merchant_link</code> in RedFace Pay to link{' '}
-                      <strong>redfacesa@gmail.com</strong> as the Pangolin merchant.
+                      Merchant linked to VV Brown Fragrances on RedFace Pay. Products sync with this storefront automatically.
                     </p>
                   )}
                 </div>
@@ -218,7 +212,7 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
                 <div className="glass rounded-xl p-4 sm:p-6">
                   <h3 className="font-semibold mb-3">Shared catalog</h3>
                   <p className="text-sm text-white/50">
-                    Products added here or in RedFace Pay use the same inventory. Pangolin storefront and Pay POS stay in sync.
+                    Fragrances added here or in RedFace Pay share the same catalog. The website and Pay POS stay in sync.
                   </p>
                   <a
                     href={buildMerchantPortalUrl('products')}
@@ -266,23 +260,6 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
               />
             )}
 
-            {tab === 'tailoring' && (
-              <div>
-                <h2 className="text-xl font-semibold mb-6">Tailoring Services & Prices</h2>
-                <div className="space-y-3">
-                  {services.map((s) => (
-                    <div key={s.id} className="glass rounded-xl p-4 flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
-                      <div className="min-w-0">
-                        <p className="font-medium">{s.name}</p>
-                        <p className="text-sm text-white/40">{s.estimated_days} days · {s.category}</p>
-                      </div>
-                      <span className="text-vbrown-gold font-semibold">{fmtZar(s.price)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {tab === 'settings' && (
               <div className="space-y-6">
                 <PayLinkStation
@@ -295,7 +272,7 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
                 <div className="glass rounded-xl p-4 sm:p-6 space-y-4">
                   <h2 className="text-xl font-semibold">Platform Settings</h2>
                   <div className="space-y-2 text-xs sm:text-sm font-mono bg-black/30 rounded-lg p-4 overflow-x-auto">
-                    <p><span className="text-white/40">ECOSYSTEM_APP:</span> pangolin</p>
+                    <p><span className="text-white/40">ECOSYSTEM_APP:</span> veebrown</p>
                     <p><span className="text-white/40">MERCHANT_ID:</span> {merchantId || 'from DB after migration'}</p>
                     <p><span className="text-white/40">SITE_URL:</span> {config.siteUrl}</p>
                     <p><span className="text-white/40">ADMIN:</span> {config.adminEmails.join(', ')}</p>
@@ -314,7 +291,7 @@ export default function AdminClient({ config }: { config: VeeBrownPlatformConfig
               </div>
             )}
 
-            {!['overview', 'pos', 'orders', 'products', 'categories', 'tailoring', 'settings'].includes(tab) && (
+            {!['overview', 'pos', 'orders', 'products', 'categories', 'settings'].includes(tab) && (
               <div className="glass rounded-xl p-8 sm:p-12 text-center text-white/40">
                 <p>{NAV.find((n) => n.id === tab)?.label} management — coming in Phase 2</p>
               </div>

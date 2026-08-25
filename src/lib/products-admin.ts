@@ -158,8 +158,8 @@ export async function createMerchantProduct(input: ProductInput): Promise<string
       stock_quantity: input.stockQuantity ?? null,
       track_inventory: trackInventory,
       item_details: itemDetails,
-      marketplace_category: 'Fashion',
-      item_category: 'Fashion',
+      marketplace_category: 'Beauty',
+      item_category: 'Fragrance',
     })
     .select('id')
     .single();

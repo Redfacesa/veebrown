@@ -66,7 +66,7 @@ export default function AdminGate({
       const next = await signInAdmin(email, password);
       if (!isAllowedAdmin(next, config)) {
         await signOutAdmin();
-        setError('This account is not authorised for Pangolin admin.');
+        setError('This account is not authorised for VV Brown Fragrances admin.');
         setSession(null);
         return;
       }
@@ -93,7 +93,7 @@ export default function AdminGate({
       <div className="pt-32 pb-16 section-padding max-w-lg mx-auto">
         <div className="text-center mb-8">
           <Shield size={48} className="mx-auto mb-6 text-vbrown-gold" />
-          <h1 className="font-display text-3xl mb-4">Pangolin Admin</h1>
+          <h1 className="font-display text-3xl mb-4">VV Brown Fragrances Admin</h1>
           <p className="text-white/50 text-sm">
             Sign in with your RedFace Pay password. Only approved admin emails can access this panel.
           </p>

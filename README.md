@@ -1,6 +1,6 @@
 # VeeBrown (VV Brown Fragrances)
 
-Classic luxury fragrance storefront on RedFace Pay.
+Classic luxury fragrance storefront on RedFace Pay. **Fragrances only** — no clothing.
 
 ## Setup
 

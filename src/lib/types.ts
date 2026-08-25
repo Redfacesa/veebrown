@@ -111,20 +111,11 @@ export type CustomerMeasurement = {
 };
 
 export const DEFAULT_CATEGORIES: Omit<Category, 'id' | 'merchant_id'>[] = [
-  { name: "Men's Wear", emoji: '👔', sort_order: 1, slug: 'mens-wear' },
-  { name: "Women's Wear", emoji: '👗', sort_order: 2, slug: 'womens-wear' },
-  { name: 'Kids', emoji: '👶', sort_order: 3, slug: 'kids' },
-  { name: 'Jackets', emoji: '🧥', sort_order: 4, slug: 'jackets' },
-  { name: 'T-Shirts', emoji: '👕', sort_order: 5, slug: 't-shirts' },
-  { name: 'Dresses', emoji: '👗', sort_order: 6, slug: 'dresses' },
-  { name: 'Pants', emoji: '👖', sort_order: 7, slug: 'pants' },
-  { name: 'Shoes', emoji: '👟', sort_order: 8, slug: 'shoes' },
-  { name: 'Scarves', emoji: '🧣', sort_order: 9, slug: 'scarves' },
-  { name: 'Hoodies', emoji: '🧥', sort_order: 10, slug: 'hoodies' },
-  { name: 'Hats', emoji: '🧢', sort_order: 11, slug: 'hats' },
-  { name: 'Accessories', emoji: '💍', sort_order: 12, slug: 'accessories' },
-  { name: 'Formal Wear', emoji: '🤵', sort_order: 13, slug: 'formal-wear' },
-  { name: 'Work Wear', emoji: '👷', sort_order: 14, slug: 'work-wear' },
+  { name: 'Women', emoji: '✨', sort_order: 1, slug: 'women' },
+  { name: 'Men', emoji: '🌿', sort_order: 2, slug: 'men' },
+  { name: 'Unisex', emoji: '💫', sort_order: 3, slug: 'unisex' },
+  { name: 'Gift sets', emoji: '🎁', sort_order: 4, slug: 'gift-sets' },
+  { name: 'Bestsellers', emoji: '⭐', sort_order: 5, slug: 'bestsellers' },
 ];
 
 export const DEFAULT_TAILORING_SERVICES: Omit<TailoringService, 'id' | 'merchant_id'>[] = [

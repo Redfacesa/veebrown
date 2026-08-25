@@ -11,7 +11,7 @@ export function buildCheckoutUrl(opts: {
 }) {
   const q = new URLSearchParams({
     utm_source: 'veebrown',
-    utm_medium: 'fashion_checkout',
+    utm_medium: 'fragrance_checkout',
     ecosystem_from: 'veebrown',
     commerce_order_id: opts.orderId,
     merchant_id: opts.merchantId,
