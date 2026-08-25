@@ -212,8 +212,8 @@ export default function CartPage() {
             </p>
           )}
           <p className="text-[10px] admin-muted text-center leading-relaxed">
-            Shipping is an estimate based on Courier Guy (SA) and DHL (international) public rate guides. Final carrier
-            is selected when your order is fulfilled.
+            Delivery is R50–R100 across South Africa for launch (1–3 bottles). International rates are higher.
+            Final carrier is selected when your order is fulfilled.
           </p>
           <button
             type="button"

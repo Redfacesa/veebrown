@@ -1,8 +1,7 @@
 /**
  * VV Brown Fragrances — indicative shipping (ZAR).
- * Benchmarks: The Courier Guy Economy ~R95 / Overnight ~R130 (≤2kg domestic);
- * DHL Express Worldwide from SA ~R550–R1,200 for 0.5–1kg by zone (2025 public guides).
- * Carrier choice at fulfilment — rates are estimates passed to checkout.
+ * Domestic launch promo: R50–R100 (standard / express, up to 3 bottles).
+ * International bands stay higher (DHL Express guides). Carrier confirmed at dispatch.
  */
 
 export type ShippingRegion =
@@ -41,15 +40,19 @@ export function bottleWeightKg(quantity: number): number {
   return Math.max(0.5, Math.round(quantity * GRAMS_PER_BOTTLE * 10) / 10);
 }
 
-/** Courier Guy–aligned domestic bands (1–3 bottles). */
+/** VV Brown promo domestic delivery — capped R50–R100 until carrier rates are finalised. */
+function capDomesticDelivery(amount: number): number {
+  return Math.min(100, Math.max(50, amount));
+}
+
+/** SA delivery bands (1–3+ bottles), kept between R50 and R100 for launch. */
 function zaStandardRate(bottles: number, remote: boolean): number {
-  const base = bottles <= 1 ? 99 : bottles === 2 ? 115 : 135;
-  return remote ? base + 35 : base;
+  const base = bottles <= 1 ? 65 : bottles === 2 ? 85 : 100;
+  return capDomesticDelivery(remote ? base + 10 : base);
 }
 
 function zaExpressRate(bottles: number, remote: boolean): number {
-  const base = bottles <= 2 ? 139 : 169;
-  return remote ? base + 40 : base;
+  return capDomesticDelivery(zaStandardRate(bottles, remote) + 15);
 }
 
 /** DHL Express–aligned international bands by weight tier. */

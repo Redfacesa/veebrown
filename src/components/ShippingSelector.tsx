@@ -57,8 +57,8 @@ export default function ShippingSelector({ bottleCount, onQuote, onMetaChange }:
       <div>
         <h3 className="font-display text-lg text-vbrown-charcoal mb-1">Delivery</h3>
         <p className="text-xs admin-muted leading-relaxed">
-          Rates aligned to The Courier Guy (South Africa) and DHL Express (international). Carrier confirmed when your
-          order is packed.
+          Launch delivery across South Africa: R50–R100 depending on location and bottle count. International rates
+          quoted separately. Carrier confirmed when your order is packed.
         </p>
       </div>
 
