@@ -9,7 +9,7 @@ import { fmtZar } from '@/lib/api';
 import { buildDirectPayUrl, createCommerceOrder } from '@/lib/redface-pay';
 import ShippingSelector, { formatDeliveryAddress } from '@/components/ShippingSelector';
 import type { ShippingQuote, ShippingRegion } from '@/lib/shipping-rates';
-import { PANGOLIN_MERCHANT_ID, SITE_URL } from '@/lib/supabase';
+import { VEEBROWN_COMMERCE_MERCHANT_ID, VEEBROWN_PAY_MERCHANT_ID, SITE_URL } from '@/lib/supabase';
 import VeeBrownLogo from '@/components/VeeBrownLogo';
 
 export default function CartPage() {
@@ -25,7 +25,8 @@ export default function CartPage() {
     postalCode: '',
   });
 
-  const merchantId = PANGOLIN_MERCHANT_ID;
+  const payMerchantId = VEEBROWN_PAY_MERCHANT_ID;
+  const commerceMerchantId = VEEBROWN_COMMERCE_MERCHANT_ID;
   const bottleCount = items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = total();
   const shippingZar = shippingQuote?.amountZar ?? 0;
@@ -49,7 +50,7 @@ export default function CartPage() {
 
   async function handleCheckout() {
     setCheckoutError('');
-    if (!merchantId) {
+    if (!payMerchantId) {
       setCheckoutError('Checkout is not configured yet. Please contact the store.');
       return;
     }
@@ -64,7 +65,7 @@ export default function CartPage() {
     try {
       const deliveryTo = formatDeliveryAddress(deliveryMeta);
       const result = await createCommerceOrder({
-        merchantId,
+        merchantId: commerceMerchantId,
         customerName: 'Customer',
         deliveryTo: `${deliveryTo} · ${shippingQuote.label}`,
         items: [
@@ -84,7 +85,7 @@ export default function CartPage() {
       });
       const orderId = String(result.order?.id ?? '');
       window.location.href = buildDirectPayUrl({
-        merchantId,
+        merchantId: payMerchantId,
         amountZar: orderTotal,
         label: orderLabel,
         returnUrl: `${SITE_URL}/dashboard/orders`,
@@ -94,7 +95,7 @@ export default function CartPage() {
       const message = err instanceof Error ? err.message : 'Could not start checkout.';
       setCheckoutError(message);
       window.location.href = buildDirectPayUrl({
-        merchantId,
+        merchantId: payMerchantId,
         amountZar: orderTotal,
         label: orderLabel,
         returnUrl: `${SITE_URL}/dashboard/orders`,

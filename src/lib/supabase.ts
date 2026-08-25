@@ -24,9 +24,15 @@ export function getSupabase(): SupabaseClient | null {
   return client;
 }
 
-/** VV Brown Fragrances merchant on RedFace Pay */
-export const PANGOLIN_MERCHANT_ID =
+/** VV Brown Fragrances pay merchant UUID on RedFace Pay */
+export const VEEBROWN_PAY_MERCHANT_ID =
   process.env.NEXT_PUBLIC_VEEBROWN_MERCHANT_ID || '44ea657f-217c-4700-9441-ad391a13e354';
+
+/** Ecosystem commerce slug (FK on platform_ecosystem_commerce_orders) */
+export const VEEBROWN_COMMERCE_MERCHANT_ID = 'veebrown';
+
+/** @deprecated Use VEEBROWN_PAY_MERCHANT_ID */
+export const PANGOLIN_MERCHANT_ID = VEEBROWN_PAY_MERCHANT_ID;
 export const REDFACE_PAY_URL = (process.env.NEXT_PUBLIC_REDFACE_PAY_URL ?? 'https://www.redfacepay.co.za').replace(/\/$/, '');
 export const COMMERCE_API = process.env.NEXT_PUBLIC_REDFACE_COMMERCE_API ?? '';
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
