@@ -26,6 +26,6 @@ export async function POST(req: Request) {
       note: 'Indicative rates aligned to Courier Guy (SA) and DHL Express (international). Final carrier selected when the order is packed.',
     });
   } catch {
-    return NextResponse.json({ ok: false, message: 'Could not calculate shipping' }, 400);
+    return NextResponse.json({ ok: false, message: 'Could not calculate shipping' }, { status: 400 });
   }
 }
