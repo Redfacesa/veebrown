@@ -15,6 +15,8 @@ import {
   type InventoryProduct,
   type SalesFeedRow,
 } from '@/lib/merchant-dashboard';
+import { computeCardPayoutSplit, computeTodayPayout } from '@/lib/payout-split';
+import PayoutSplitCard from '@/components/admin/PayoutSplitCard';
 import { buildMerchantPortalUrl } from '@/lib/redface-pay';
 
 function StatCard({
@@ -86,6 +88,12 @@ export default function SalesDashboard({
   const lowStock = inventory.filter(isLowStock);
   const trackedStock = inventory.filter((p) => p.track_inventory && p.stock_quantity != null);
   const totalUnits = trackedStock.reduce((sum, p) => sum + (p.stock_quantity ?? 0), 0);
+  const todayPayout = computeTodayPayout({
+    digitalGross: stats?.today_digital ?? 0,
+    cashGross: stats?.today_cash ?? 0,
+  });
+  const latestCardSale = sales.find((row) => row.source === 'paystack' && row.status === 'success');
+  const latestSplit = latestCardSale ? computeCardPayoutSplit(latestCardSale.amount) : null;
 
   return (
     <div className="space-y-6">
@@ -114,27 +122,56 @@ export default function SalesDashboard({
         <StatCard
           label="Made today"
           value={fmtZar(stats?.today_total ?? 0)}
-          hint={`${stats?.today_count ?? 0} sale${stats?.today_count === 1 ? '' : 's'}`}
+          hint={`${stats?.today_count ?? 0} sale${stats?.today_count === 1 ? '' : 's'} · what customers paid`}
           icon={TrendingUp}
+          accent
+        />
+        <StatCard
+          label="You receive today"
+          value={fmtZar(todayPayout.merchantNet)}
+          hint={
+            todayPayout.totalFees > 0
+              ? `After Paystack + RedFace (~${fmtZar(todayPayout.totalFees)} on card)`
+              : 'Card and cash combined'
+          }
+          icon={Banknote}
           accent
         />
         <StatCard
           label="Card / online"
           value={fmtZar(stats?.today_digital ?? 0)}
+          hint={
+            stats?.today_digital
+              ? `You keep ~${fmtZar(computeCardPayoutSplit(stats.today_digital).merchantNet)}`
+              : undefined
+          }
           icon={CreditCard}
         />
         <StatCard
           label="Cash at counter"
           value={fmtZar(stats?.today_cash ?? 0)}
+          hint="No card processing fee"
           icon={Banknote}
         />
+      </div>
+
+      {(todayPayout.digitalGross > 0 || latestSplit) && (
+        <PayoutSplitCard
+          split={latestSplit ?? computeCardPayoutSplit(todayPayout.digitalGross)}
+          title={latestSplit ? 'Latest card payment split' : 'Today’s card sales split'}
+          reference={latestCardSale?.reference}
+          compact={compact}
+        />
+      )}
+
+      {!compact && (
         <StatCard
           label="Units in stock"
           value={String(totalUnits)}
           hint={lowStock.length ? `${lowStock.length} low-stock alert${lowStock.length === 1 ? '' : 's'}` : 'Tracked inventory'}
           icon={Package}
         />
-      </div>
+      )}
 
       {!compact && (
         <div className="grid lg:grid-cols-2 gap-6">
@@ -149,7 +186,9 @@ export default function SalesDashboard({
               <p className="admin-muted text-sm">No sales yet. They will appear here once customers checkout.</p>
             ) : (
               <ul className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
-                {sales.map((row) => (
+                {sales.map((row) => {
+                  const split = row.source === 'paystack' ? computeCardPayoutSplit(row.amount) : null;
+                  return (
                   <li key={row.id} className="border border-vbrown-charcoal/8 bg-white px-3 py-3">
                     <div className="flex justify-between gap-3">
                       <div className="min-w-0">
@@ -157,11 +196,19 @@ export default function SalesDashboard({
                         <p className="text-xs admin-muted mt-0.5">
                           {row.customer} · {paymentMethodLabel(row.payment_method)} · {formatSoldAt(row.sold_at)}
                         </p>
+                        {split && (
+                          <p className="text-xs text-vbrown-gold/90 mt-1">
+                            You receive {fmtZar(split.merchantNet)} · Paystack {fmtZar(split.paystackFee)} · RedFace {fmtZar(split.redfaceFee)}
+                          </p>
+                        )}
                       </div>
-                      <span className="text-vbrown-gold font-display shrink-0">{fmtZar(row.amount)}</span>
+                      <div className="text-right shrink-0">
+                        <span className="text-vbrown-gold font-display block">{fmtZar(row.amount)}</span>
+                        {split && <span className="text-[11px] admin-muted">paid</span>}
+                      </div>
                     </div>
                   </li>
-                ))}
+                );})}
               </ul>
             )}
           </div>
