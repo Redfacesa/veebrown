@@ -172,7 +172,7 @@ function EditorialBlock({
 
 function EditorialSection() {
   const femme = FRAGRANCE_COPY.femmeDuPatron;
-  const baron = FRAGRANCE_COPY.leBaron;
+  const patron = FRAGRANCE_COPY.patron;
 
   return (
     <section className="bg-vbrown-ivory border-b border-vbrown-charcoal/8">
@@ -186,13 +186,13 @@ function EditorialSection() {
         linkLabel="Shop Femme du Patron"
       />
       <EditorialBlock
-        image={BRAND_IMAGES.editorialBaron}
-        alt={`${baron.title} — VV Brown Fragrances for men`}
-        eyebrow={baron.eyebrow}
-        title={baron.title}
-        body={baron.body}
-        href={`/product/${FRAGRANCE_PRODUCT_IDS.leBaron}`}
-        linkLabel="Shop Le Baron"
+        image={BRAND_IMAGES.editorialPatron}
+        alt={`${patron.title} — VV Brown Fragrances for men`}
+        eyebrow={patron.eyebrow}
+        title={patron.title}
+        body={patron.body}
+        href={`/product/${FRAGRANCE_PRODUCT_IDS.patron}`}
+        linkLabel="Shop Patron"
         reverse
       />
     </section>
