@@ -6,6 +6,7 @@ import ProductGrid from '@/components/ProductGrid';
 import type { Category, FashionProduct } from '@/lib/types';
 import { DEFAULT_CATEGORIES } from '@/lib/types';
 import { fetchCategories, fetchProducts } from '@/lib/api';
+import { sortSignatureFragrancesFirst } from '@/lib/fragrance-catalog';
 
 export default function ShopClient() {
   const searchParams = useSearchParams();
@@ -25,7 +26,7 @@ export default function ShopClient() {
         categoryId: cat?.id,
         limit: 50,
       }).catch(() => []);
-      setProducts(prods);
+      setProducts(sortSignatureFragrancesFirst(prods));
       setLoading(false);
     }
     load();

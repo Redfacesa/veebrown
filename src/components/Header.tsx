@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import VeeBrownLogo from '@/components/VeeBrownLogo';
+import PwaInstallButton from '@/components/PwaInstallButton';
 import { useCart } from '@/lib/store';
 
 const NAV = [
@@ -35,7 +36,8 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-5 text-xs tracking-[0.15em] uppercase">
+        <div className="flex items-center gap-4 sm:gap-5 text-xs tracking-[0.15em] uppercase">
+          <PwaInstallButton className="hidden sm:inline-flex" />
           <Link href="/search" className="nav-link-light hidden sm:inline">Search</Link>
           <Link href="/dashboard" className="nav-link-light hidden sm:inline">Account</Link>
           <Link href="/cart" className="nav-link-light">Bag ({count})</Link>
@@ -52,6 +54,7 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+          <PwaInstallButton />
         </nav>
       )}
     </header>

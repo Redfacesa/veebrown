@@ -6,6 +6,12 @@ import Link from 'next/link';
 import type { FashionProduct } from '@/lib/types';
 import { fmtZar } from '@/lib/api';
 import { BRAND_IMAGES } from '@/lib/brand-images';
+import {
+  FRAGRANCE_COPY,
+  FRAGRANCE_PRODUCT_IDS,
+  isSignatureFragrance,
+  sortSignatureFragrancesFirst,
+} from '@/lib/fragrance-catalog';
 
 type Props = {
   products: FashionProduct[];
@@ -25,7 +31,6 @@ export default function Hero(_props: Props) {
     <>
       <section className="relative bg-black overflow-hidden">
         <div className="grid lg:grid-cols-[minmax(0,42%)_1fr] min-h-[88vh]">
-          {/* Text — left on desktop */}
           <div className="relative z-20 flex flex-col justify-center px-4 sm:px-6 lg:px-10 py-14 lg:py-20 order-2 lg:order-1 bg-black lg:bg-transparent">
             <motion.p
               custom={0}
@@ -34,7 +39,7 @@ export default function Hero(_props: Props) {
               animate="show"
               className="text-vbrown-cream/50 text-[10px] sm:text-xs tracking-[0.45em] uppercase mb-4"
             >
-              VV Brown Fragrances
+              Signature scent · VV Brown Fragrances
             </motion.p>
             <motion.h1
               custom={1}
@@ -43,7 +48,7 @@ export default function Hero(_props: Props) {
               animate="show"
               className="font-display text-4xl sm:text-5xl lg:text-[3.25rem] text-vbrown-cream leading-[1.08] mb-5"
             >
-              Elegant scents for those who lead.
+              {FRAGRANCE_COPY.patron.title}
             </motion.h1>
             <motion.p
               custom={2}
@@ -52,22 +57,24 @@ export default function Hero(_props: Props) {
               animate="show"
               className="text-vbrown-cream/65 text-sm sm:text-base max-w-md leading-relaxed mb-8"
             >
-              Sophisticated eau de parfum for women and men. Minimal. Classic. Unforgettable.
+              {FRAGRANCE_COPY.patron.body}
             </motion.p>
             <motion.div custom={3} variants={fadeUp} initial="hidden" animate="show" className="flex flex-wrap gap-3">
-              <Link href="/shop" className="btn-classic bg-vbrown-cream text-vbrown-charcoal hover:bg-white">
-                Shop fragrances
+              <Link
+                href={`/product/${FRAGRANCE_PRODUCT_IDS.patron}`}
+                className="btn-classic bg-vbrown-cream text-vbrown-charcoal hover:bg-white"
+              >
+                Shop Patron
               </Link>
               <Link
-                href="/#collections"
+                href={`/product/${FRAGRANCE_PRODUCT_IDS.femmeDuPatron}`}
                 className="btn-outline border-vbrown-cream/30 text-vbrown-cream hover:border-vbrown-cream"
               >
-                The collection
+                Femme du Patron
               </Link>
             </motion.div>
           </div>
 
-          {/* Hero image — full frame, no crop */}
           <div className="relative order-1 lg:order-2 min-h-[48vh] lg:min-h-[88vh] bg-black flex items-center justify-center">
             <motion.div
               className="relative w-full h-full flex items-center justify-center p-3 sm:p-6 lg:p-10"
@@ -81,8 +88,8 @@ export default function Hero(_props: Props) {
                 className="relative w-full max-w-2xl mx-auto"
               >
                 <Image
-                  src={BRAND_IMAGES.hero}
-                  alt="VV Brown Fragrances — MADAME eau de parfum"
+                  src={BRAND_IMAGES.heroPatron}
+                  alt="Patron — VV Brown Fragrances eau de parfum for men"
                   width={900}
                   height={1125}
                   priority
@@ -91,7 +98,6 @@ export default function Hero(_props: Props) {
                 />
               </motion.div>
             </motion.div>
-            {/* Soft fade from left so text area reads on overlap */}
             <div
               className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent lg:via-black/35"
               aria-hidden
@@ -129,11 +135,7 @@ function EditorialBlock({
   reverse?: boolean;
 }) {
   return (
-    <div
-      className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center ${
-        reverse ? '' : ''
-      }`}
-    >
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -172,25 +174,28 @@ function EditorialBlock({
 }
 
 function EditorialSection() {
+  const femme = FRAGRANCE_COPY.femmeDuPatron;
+  const baron = FRAGRANCE_COPY.leBaron;
+
   return (
     <section className="bg-vbrown-ivory border-b border-vbrown-charcoal/8">
       <EditorialBlock
         image={BRAND_IMAGES.editorialFemme}
-        alt="Femme du Patron — VV Brown Fragrances for women"
-        eyebrow="For her"
-        title="Femme du Patron"
-        body="Refined florals and warm skin notes. A signature for the woman who commands the room with quiet confidence."
-        href="/shop"
-        linkLabel="Explore women's fragrances"
+        alt={`${femme.title} — VV Brown Fragrances for women`}
+        eyebrow={femme.eyebrow}
+        title={femme.title}
+        body={femme.body}
+        href={`/product/${FRAGRANCE_PRODUCT_IDS.femmeDuPatron}`}
+        linkLabel="Shop Femme du Patron"
       />
       <EditorialBlock
         image={BRAND_IMAGES.editorialBaron}
-        alt="Le Baron — VV Brown Fragrances for men"
-        eyebrow="For him"
-        title="Le Baron"
-        body="Woody depth and clean masculinity. Built for the modern patron who values presence over noise."
-        href="/shop"
-        linkLabel="Explore men's fragrances"
+        alt={`${baron.title} — VV Brown Fragrances for men`}
+        eyebrow={baron.eyebrow}
+        title={baron.title}
+        body={baron.body}
+        href={`/product/${FRAGRANCE_PRODUCT_IDS.leBaron}`}
+        linkLabel="Shop Le Baron"
         reverse
       />
     </section>
@@ -198,17 +203,22 @@ function EditorialSection() {
 }
 
 export function CollectionsSection({ products }: Props) {
-  if (!products.length) return null;
+  const sorted = sortSignatureFragrancesFirst(products);
+  if (!sorted.length) return null;
 
   return (
     <section id="collections" className="section-padding py-16 lg:py-24 bg-vbrown-ivory">
       <div className="text-center mb-14">
         <p className="text-vbrown-gold text-[10px] tracking-[0.4em] uppercase mb-3">The collection</p>
         <h2 className="font-display text-3xl sm:text-4xl text-vbrown-charcoal">Signature fragrances</h2>
+        <p className="mt-3 text-sm text-vbrown-charcoal/50 max-w-md mx-auto">
+          Patron and Femme du Patron lead the house. Explore every scent below.
+        </p>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-        {products.map((p, i) => {
+        {sorted.map((p, i) => {
           const img = p.images?.[0] ?? p.image_url;
+          const signature = isSignatureFragrance(p.name);
           return (
             <motion.article
               key={p.id}
@@ -222,6 +232,11 @@ export function CollectionsSection({ products }: Props) {
                 href={`/product/${p.id}`}
                 className="block relative aspect-[3/4] bg-vbrown-cream overflow-hidden mb-5"
               >
+                {signature ? (
+                  <span className="absolute top-3 left-3 z-10 bg-vbrown-charcoal text-vbrown-cream text-[9px] tracking-[0.25em] uppercase px-2.5 py-1">
+                    Signature
+                  </span>
+                ) : null}
                 {img ? (
                   <Image
                     src={img}
@@ -260,8 +275,8 @@ export function AboutSection() {
         <p className="text-vbrown-gold text-[10px] tracking-[0.4em] uppercase mb-4">The house</p>
         <h2 className="font-display text-3xl text-vbrown-charcoal mb-6">VV Brown Fragrances</h2>
         <p className="text-vbrown-charcoal/65 leading-relaxed">
-          A fragrance house rooted in elegance and restraint. Each scent is composed for presence, poise, and the
-          quiet power of a classic signature. Perfume only. Nothing else.
+          A fragrance house rooted in elegance and restraint. Patron and Femme du Patron are the signatures of the
+          house. Each scent is composed for presence, poise, and the quiet power of a classic signature.
         </p>
       </div>
     </section>
