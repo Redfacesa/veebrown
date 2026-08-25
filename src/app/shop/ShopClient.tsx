@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductGrid from '@/components/ProductGrid';
 import type { Category, FashionProduct } from '@/lib/types';
-import { DEFAULT_CATEGORIES } from '@/lib/types';
+import { FRAGRANCE_FALLBACK_CATEGORIES, filterFragranceCategories, legacyCategorySlug } from '@/lib/fragrance-categories';
 import { fetchCategories, fetchProducts } from '@/lib/api';
 import { sortSignatureFragrancesFirst } from '@/lib/fragrance-catalog';
 
@@ -18,10 +18,10 @@ export default function ShopClient() {
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const cats = await fetchCategories().catch(() => []);
+      const cats = filterFragranceCategories(await fetchCategories().catch(() => []));
       setCategories(cats);
 
-      const cat = cats.find((c) => c.slug === categorySlug);
+      const cat = cats.find((c) => c.slug === categorySlug || c.slug === legacyCategorySlug(categorySlug));
       const prods = await fetchProducts({
         categoryId: cat?.id,
         limit: 50,
@@ -34,7 +34,7 @@ export default function ShopClient() {
 
   const allCats = categories.length
     ? categories
-    : DEFAULT_CATEGORIES.map((c, i) => ({ ...c, id: `cat-${i}`, merchant_id: '' }));
+    : FRAGRANCE_FALLBACK_CATEGORIES.map((c, i) => ({ ...c, id: `cat-${i}`, merchant_id: '' }));
 
   return (
     <div className="pt-20 pb-16 bg-vbrown-ivory">

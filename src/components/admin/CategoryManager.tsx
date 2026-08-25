@@ -98,7 +98,7 @@ export default function CategoryManager({ merchantId, categories, onChange }: Pr
         <div>
           <h2 className="text-xl font-semibold">Fragrance categories</h2>
           <p className="text-sm text-white/40 mt-1 max-w-xl">
-            Organise your catalog — Men&apos;s, Women&apos;s, Jackets, Shoes, and more. Shared with RedFace Pay POS.
+            Organise your fragrance catalog — For Her, For Him, and more. Shared with RedFace Pay.
           </p>
         </div>
         <button

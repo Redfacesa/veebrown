@@ -4,16 +4,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import type { Category } from '@/lib/types';
-import { DEFAULT_CATEGORIES } from '@/lib/types';
+import { FRAGRANCE_FALLBACK_CATEGORIES, filterFragranceCategories } from '@/lib/fragrance-categories';
 
 type Props = {
   categories?: Category[];
 };
 
 export default function CategoryGrid({ categories }: Props) {
-  const items = categories?.length
-    ? categories
-    : DEFAULT_CATEGORIES.map((c, i) => ({
+  const normalized = categories?.length ? filterFragranceCategories(categories) : [];
+  const items = normalized.length
+    ? normalized
+    : FRAGRANCE_FALLBACK_CATEGORIES.map((c, i) => ({
         ...c,
         id: `cat-${i}`,
         merchant_id: '',
@@ -22,9 +23,9 @@ export default function CategoryGrid({ categories }: Props) {
   return (
     <section className="section-padding py-24">
       <div className="text-center mb-16">
-        <h2 className="font-display text-4xl lg:text-5xl mb-4">Shop by Category</h2>
+        <h2 className="font-display text-4xl lg:text-5xl mb-4">Shop by scent</h2>
         <p className="text-white/50 max-w-xl mx-auto">
-          From everyday essentials to statement pieces — find your perfect look.
+          For her, for him, and signature fragrances from VV Brown.
         </p>
       </div>
 
