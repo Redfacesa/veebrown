@@ -19,7 +19,7 @@ export default function Header() {
   const count = useCart((s) => s.itemCount());
 
   return (
-    <header className="sticky top-0 z-50 bg-vbrown-ivory/95 border-b border-vbrown-charcoal/10 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 bg-black border-b border-white/10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between">
         <VeeBrownLogo href="/" />
 
@@ -28,7 +28,7 @@ export default function Header() {
             <Link
               key={item.label}
               href={item.href}
-              className={`nav-link ${pathname === item.href ? 'text-vbrown-gold' : ''}`}
+              className={`nav-link-light ${pathname === item.href ? '!text-vbrown-gold' : ''}`}
             >
               {item.label}
             </Link>
@@ -36,19 +36,19 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-5 text-xs tracking-[0.15em] uppercase">
-          <Link href="/search" className="nav-link hidden sm:inline">Search</Link>
-          <Link href="/dashboard" className="nav-link hidden sm:inline">Account</Link>
-          <Link href="/cart" className="nav-link">Bag ({count})</Link>
-          <button type="button" className="md:hidden nav-link" onClick={() => setOpen(!open)} aria-label="Menu">
+          <Link href="/search" className="nav-link-light hidden sm:inline">Search</Link>
+          <Link href="/dashboard" className="nav-link-light hidden sm:inline">Account</Link>
+          <Link href="/cart" className="nav-link-light">Bag ({count})</Link>
+          <button type="button" className="md:hidden nav-link-light" onClick={() => setOpen(!open)} aria-label="Menu">
             Menu
           </button>
         </div>
       </div>
 
       {open && (
-        <nav className="md:hidden border-t border-vbrown-charcoal/10 px-6 py-4 flex flex-col gap-3 bg-vbrown-ivory">
+        <nav className="md:hidden border-t border-white/10 px-6 py-4 flex flex-col gap-3 bg-black">
           {NAV.map((item) => (
-            <Link key={item.label} href={item.href} onClick={() => setOpen(false)} className="nav-link text-sm">
+            <Link key={item.label} href={item.href} onClick={() => setOpen(false)} className="nav-link-light text-sm">
               {item.label}
             </Link>
           ))}

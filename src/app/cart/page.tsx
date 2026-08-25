@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Minus, Plus, Trash2, ArrowRight } from 'lucide-react';
@@ -7,13 +8,26 @@ import { useCart } from '@/lib/store';
 import { fmtZar } from '@/lib/api';
 import RedFacePayButtons from '@/components/RedFacePayButtons';
 import { createCommerceOrder } from '@/lib/redface-pay';
-import { useEffect, useState } from 'react';
+import ShippingSelector, { formatDeliveryAddress } from '@/components/ShippingSelector';
+import type { ShippingQuote, ShippingRegion } from '@/lib/shipping-rates';
 import VeeBrownLogo from '@/components/VeeBrownLogo';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, total, clearCart } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
   const [merchantId, setMerchantId] = useState('');
+  const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
+  const [deliveryMeta, setDeliveryMeta] = useState({
+    region: 'za_national' as ShippingRegion,
+    province: 'Gauteng',
+    city: '',
+    postalCode: '',
+  });
+
+  const bottleCount = items.reduce((s, i) => s + i.quantity, 0);
+  const subtotal = total();
+  const shippingZar = shippingQuote?.amountZar ?? 0;
+  const orderTotal = subtotal + shippingZar;
 
   useEffect(() => {
     fetch('/api/config')
@@ -21,20 +35,33 @@ export default function CartPage() {
       .then((c) => setMerchantId(c.payMerchantId ?? ''));
   }, []);
 
+  const handleShippingQuote = useCallback((quote: ShippingQuote | null) => {
+    setShippingQuote(quote);
+  }, []);
+
   async function handleCheckout() {
-    if (!merchantId || !items.length) return;
+    if (!merchantId || !items.length || !shippingQuote) return;
     setCheckingOut(true);
     try {
+      const deliveryTo = formatDeliveryAddress(deliveryMeta);
       const result = await createCommerceOrder({
         merchantId,
         customerName: 'Customer',
-        deliveryTo: 'To be confirmed',
-        items: items.map((i) => ({
-          product_id: i.product.id,
-          product_name: i.product.name,
-          price_zar: i.product.price,
-          quantity: i.quantity,
-        })),
+        deliveryTo: `${deliveryTo} · ${shippingQuote.label}`,
+        items: [
+          ...items.map((i) => ({
+            product_id: i.product.id,
+            product_name: i.product.name,
+            price_zar: i.product.price,
+            quantity: i.quantity,
+          })),
+          {
+            product_id: `shipping-${shippingQuote.region}`,
+            product_name: `Delivery — ${shippingQuote.label}`,
+            price_zar: shippingQuote.amountZar,
+            quantity: 1,
+          },
+        ],
       });
       if (result.checkout_url) {
         window.location.href = result.checkout_url;
@@ -56,8 +83,6 @@ export default function CartPage() {
     );
   }
 
-  const cartTotal = total();
-
   return (
     <div className="pt-20 pb-16 bg-vbrown-ivory">
       <div className="section-padding max-w-4xl mx-auto">
@@ -68,9 +93,14 @@ export default function CartPage() {
             const key = `${item.product.id}-${item.size}-${item.color}`;
             return (
               <div key={key} className="border border-vbrown-charcoal/10 bg-vbrown-cream p-4 flex gap-4">
-                <div className="relative w-24 h-28 overflow-hidden bg-vbrown-charcoal shrink-0 border border-vbrown-charcoal/10">
+                <div className="relative w-24 h-28 overflow-hidden bg-black shrink-0 border border-vbrown-charcoal/10">
                   {item.product.image_url ? (
-                    <Image src={item.product.image_url} alt={item.product.name} fill className="object-cover" />
+                    <Image
+                      src={item.product.image_url}
+                      alt={item.product.name}
+                      fill
+                      className="object-contain p-1"
+                    />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center p-2">
                       <VeeBrownLogo href={null} variant="mark" size="footer" />
@@ -112,21 +142,49 @@ export default function CartPage() {
           })}
         </div>
 
-        <div className="border border-vbrown-charcoal/10 bg-vbrown-cream p-6 space-y-4">
-          <div className="flex justify-between text-lg text-vbrown-charcoal">
-            <span>Subtotal</span>
-            <span className="font-display text-vbrown-gold">{fmtZar(cartTotal)}</span>
+        <div className="mb-8">
+          <ShippingSelector
+            bottleCount={bottleCount}
+            onQuote={handleShippingQuote}
+            onMetaChange={setDeliveryMeta}
+          />
+        </div>
+
+        <div className="border border-vbrown-charcoal/10 bg-vbrown-cream p-6 space-y-3">
+          <div className="flex justify-between text-sm text-vbrown-charcoal/70">
+            <span>Subtotal ({bottleCount} item{bottleCount === 1 ? '' : 's'})</span>
+            <span>{fmtZar(subtotal)}</span>
+          </div>
+          <div className="flex justify-between text-sm text-vbrown-charcoal/70">
+            <span>Delivery</span>
+            <span>{shippingQuote ? fmtZar(shippingQuote.amountZar) : '—'}</span>
+          </div>
+          <div className="flex justify-between text-lg text-vbrown-charcoal border-t border-vbrown-charcoal/10 pt-3">
+            <span>Total</span>
+            <span className="font-display text-vbrown-gold">{fmtZar(orderTotal)}</span>
           </div>
           <button
             type="button"
             onClick={handleCheckout}
-            disabled={checkingOut}
-            className="btn-classic w-full"
+            disabled={checkingOut || !shippingQuote}
+            className="btn-classic w-full mt-2"
           >
             {checkingOut ? 'Redirecting to RedFace Pay...' : 'Checkout with RedFace Pay'}
           </button>
-          <RedFacePayButtons amount={cartTotal} label="VV Brown Fragrances order" onBuyNow={handleCheckout} />
-          <button type="button" onClick={() => clearCart()} className="text-xs tracking-widest uppercase text-vbrown-charcoal/40 hover:text-vbrown-gold w-full">
+          <RedFacePayButtons
+            amount={orderTotal}
+            label="VV Brown Fragrances order"
+            onBuyNow={handleCheckout}
+          />
+          <p className="text-[10px] admin-muted text-center leading-relaxed">
+            Shipping is an estimate based on Courier Guy (SA) and DHL (international) public rate guides. Final carrier
+            is selected when your order is fulfilled.
+          </p>
+          <button
+            type="button"
+            onClick={() => clearCart()}
+            className="text-xs tracking-widest uppercase text-vbrown-charcoal/40 hover:text-vbrown-gold w-full"
+          >
             Clear bag
           </button>
         </div>

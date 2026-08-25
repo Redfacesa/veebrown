@@ -1,5 +1,8 @@
-import Link from 'next/link';
+'use client';
+
+import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { FashionProduct } from '@/lib/types';
 import { fmtZar } from '@/lib/api';
 import { BRAND_IMAGES } from '@/lib/brand-images';
@@ -8,39 +11,95 @@ type Props = {
   products: FashionProduct[];
 };
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.15 + i * 0.08, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
 export default function Hero(_props: Props) {
   return (
     <>
-      <section className="relative min-h-[78vh] lg:min-h-[85vh] flex items-end bg-vbrown-charcoal">
-        <Image
-          src={BRAND_IMAGES.hero}
-          alt="VV Brown Fragrances — MADAME eau de parfum"
-          fill
-          priority
-          className="object-cover object-[center_20%] opacity-90"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-vbrown-charcoal via-vbrown-charcoal/40 to-transparent" />
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-14 lg:pb-20 pt-32">
-          <p className="text-vbrown-cream/60 text-[10px] sm:text-xs tracking-[0.45em] uppercase mb-4">
-            VV Brown Fragrances
-          </p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-vbrown-cream leading-[1.05] max-w-xl mb-5">
-            Elegant scents for those who lead.
-          </h1>
-          <p className="text-vbrown-cream/70 text-sm sm:text-base max-w-md leading-relaxed mb-8">
-            Sophisticated eau de parfum for women and men. Minimal. Classic. Unforgettable.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/shop" className="btn-classic bg-vbrown-cream text-vbrown-charcoal hover:bg-white">
-              Shop fragrances
-            </Link>
-            <Link
-              href="/#collections"
-              className="btn-outline border-vbrown-cream/35 text-vbrown-cream hover:border-vbrown-cream hover:text-vbrown-cream"
+      <section className="relative bg-black overflow-hidden">
+        <div className="grid lg:grid-cols-[minmax(0,42%)_1fr] min-h-[88vh]">
+          {/* Text — left on desktop */}
+          <div className="relative z-20 flex flex-col justify-center px-4 sm:px-6 lg:px-10 py-14 lg:py-20 order-2 lg:order-1 bg-black lg:bg-transparent">
+            <motion.p
+              custom={0}
+              variants={fadeUp}
+              initial="hidden"
+              animate="show"
+              className="text-vbrown-cream/50 text-[10px] sm:text-xs tracking-[0.45em] uppercase mb-4"
             >
-              The collection
-            </Link>
+              VV Brown Fragrances
+            </motion.p>
+            <motion.h1
+              custom={1}
+              variants={fadeUp}
+              initial="hidden"
+              animate="show"
+              className="font-display text-4xl sm:text-5xl lg:text-[3.25rem] text-vbrown-cream leading-[1.08] mb-5"
+            >
+              Elegant scents for those who lead.
+            </motion.h1>
+            <motion.p
+              custom={2}
+              variants={fadeUp}
+              initial="hidden"
+              animate="show"
+              className="text-vbrown-cream/65 text-sm sm:text-base max-w-md leading-relaxed mb-8"
+            >
+              Sophisticated eau de parfum for women and men. Minimal. Classic. Unforgettable.
+            </motion.p>
+            <motion.div custom={3} variants={fadeUp} initial="hidden" animate="show" className="flex flex-wrap gap-3">
+              <Link href="/shop" className="btn-classic bg-vbrown-cream text-vbrown-charcoal hover:bg-white">
+                Shop fragrances
+              </Link>
+              <Link
+                href="/#collections"
+                className="btn-outline border-vbrown-cream/30 text-vbrown-cream hover:border-vbrown-cream"
+              >
+                The collection
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Hero image — full frame, no crop */}
+          <div className="relative order-1 lg:order-2 min-h-[48vh] lg:min-h-[88vh] bg-black flex items-center justify-center">
+            <motion.div
+              className="relative w-full h-full flex items-center justify-center p-3 sm:p-6 lg:p-10"
+              initial={{ opacity: 0, scale: 1.03 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <motion.div
+                animate={{ scale: [1, 1.02, 1] }}
+                transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+                className="relative w-full max-w-2xl mx-auto"
+              >
+                <Image
+                  src={BRAND_IMAGES.hero}
+                  alt="VV Brown Fragrances — MADAME eau de parfum"
+                  width={900}
+                  height={1125}
+                  priority
+                  className="w-full h-auto max-h-[75vh] object-contain mx-auto"
+                  sizes="(max-width:1024px) 100vw, 55vw"
+                />
+              </motion.div>
+            </motion.div>
+            {/* Soft fade from left so text area reads on overlap */}
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black via-black/55 to-transparent lg:via-black/35"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent lg:hidden"
+              aria-hidden
+            />
           </div>
         </div>
       </section>
@@ -50,52 +109,90 @@ export default function Hero(_props: Props) {
   );
 }
 
+function EditorialBlock({
+  image,
+  alt,
+  eyebrow,
+  title,
+  body,
+  href,
+  linkLabel,
+  reverse,
+}: {
+  image: string;
+  alt: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  href: string;
+  linkLabel: string;
+  reverse?: boolean;
+}) {
+  return (
+    <div
+      className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center ${
+        reverse ? '' : ''
+      }`}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.8 }}
+        className={`relative bg-black flex items-center justify-center p-4 sm:p-6 ${reverse ? 'lg:order-2' : ''}`}
+      >
+        <Image
+          src={image}
+          alt={alt}
+          width={800}
+          height={1000}
+          className="w-full h-auto max-h-[min(85vh,720px)] object-contain"
+          sizes="(max-width:1024px) 100vw, 45vw"
+        />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.8, delay: 0.1 }}
+        className={`lg:py-6 ${reverse ? 'lg:order-1' : ''}`}
+      >
+        <p className="text-vbrown-gold text-[10px] tracking-[0.4em] uppercase mb-4">{eyebrow}</p>
+        <h2 className="font-display text-3xl sm:text-4xl text-vbrown-charcoal mb-5">{title}</h2>
+        <p className="text-vbrown-charcoal/65 leading-relaxed mb-6">{body}</p>
+        <Link
+          href={href}
+          className="text-[10px] tracking-[0.3em] uppercase text-vbrown-charcoal/45 hover:text-vbrown-gold transition-colors"
+        >
+          {linkLabel}
+        </Link>
+      </motion.div>
+    </div>
+  );
+}
+
 function EditorialSection() {
   return (
     <section className="bg-vbrown-ivory border-b border-vbrown-charcoal/8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-16 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-        <div className="relative aspect-[4/5] overflow-hidden bg-vbrown-cream">
-          <Image
-            src={BRAND_IMAGES.editorialFemme}
-            alt="Femme du Patron — VV Brown Fragrances for women"
-            fill
-            className="object-cover"
-            sizes="(max-width:1024px) 100vw, 50vw"
-          />
-        </div>
-        <div className="lg:py-8">
-          <p className="text-vbrown-gold text-[10px] tracking-[0.4em] uppercase mb-4">For her</p>
-          <h2 className="font-display text-3xl sm:text-4xl text-vbrown-charcoal mb-5">Femme du Patron</h2>
-          <p className="text-vbrown-charcoal/65 leading-relaxed mb-6">
-            Refined florals and warm skin notes. A signature for the woman who commands the room with quiet confidence.
-          </p>
-          <Link href="/shop" className="text-xs tracking-[0.25em] uppercase text-vbrown-charcoal/50 hover:text-vbrown-gold transition-colors">
-            Explore women&apos;s fragrances
-          </Link>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-16 lg:pb-24 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-        <div className="lg:order-2 relative aspect-[4/5] overflow-hidden bg-vbrown-charcoal">
-          <Image
-            src={BRAND_IMAGES.editorialBaron}
-            alt="Le Baron — VV Brown Fragrances for men"
-            fill
-            className="object-cover"
-            sizes="(max-width:1024px) 100vw, 50vw"
-          />
-        </div>
-        <div className="lg:order-1 lg:py-8">
-          <p className="text-vbrown-gold text-[10px] tracking-[0.4em] uppercase mb-4">For him</p>
-          <h2 className="font-display text-3xl sm:text-4xl text-vbrown-charcoal mb-5">Le Baron</h2>
-          <p className="text-vbrown-charcoal/65 leading-relaxed mb-6">
-            Woody depth and clean masculinity. Built for the modern patron who values presence over noise.
-          </p>
-          <Link href="/shop" className="text-xs tracking-[0.25em] uppercase text-vbrown-charcoal/50 hover:text-vbrown-gold transition-colors">
-            Explore men&apos;s fragrances
-          </Link>
-        </div>
-      </div>
+      <EditorialBlock
+        image={BRAND_IMAGES.editorialFemme}
+        alt="Femme du Patron — VV Brown Fragrances for women"
+        eyebrow="For her"
+        title="Femme du Patron"
+        body="Refined florals and warm skin notes. A signature for the woman who commands the room with quiet confidence."
+        href="/shop"
+        linkLabel="Explore women's fragrances"
+      />
+      <EditorialBlock
+        image={BRAND_IMAGES.editorialBaron}
+        alt="Le Baron — VV Brown Fragrances for men"
+        eyebrow="For him"
+        title="Le Baron"
+        body="Woody depth and clean masculinity. Built for the modern patron who values presence over noise."
+        href="/shop"
+        linkLabel="Explore men's fragrances"
+        reverse
+      />
     </section>
   );
 }
@@ -110,10 +207,17 @@ export function CollectionsSection({ products }: Props) {
         <h2 className="font-display text-3xl sm:text-4xl text-vbrown-charcoal">Signature fragrances</h2>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-        {products.map((p) => {
+        {products.map((p, i) => {
           const img = p.images?.[0] ?? p.image_url;
           return (
-            <article key={p.id} className="group text-center">
+            <motion.article
+              key={p.id}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06, duration: 0.6 }}
+              className="group text-center"
+            >
               <Link
                 href={`/product/${p.id}`}
                 className="block relative aspect-[3/4] bg-vbrown-cream overflow-hidden mb-5"
@@ -123,7 +227,7 @@ export function CollectionsSection({ products }: Props) {
                     src={img}
                     alt={p.name}
                     fill
-                    className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+                    className="object-contain p-4 group-hover:scale-[1.02] transition-transform duration-700 ease-out"
                     sizes="(max-width:768px) 50vw, 33vw"
                   />
                 ) : null}
@@ -136,7 +240,7 @@ export function CollectionsSection({ products }: Props) {
               >
                 View details
               </Link>
-            </article>
+            </motion.article>
           );
         })}
       </div>

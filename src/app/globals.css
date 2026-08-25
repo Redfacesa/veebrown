@@ -19,6 +19,9 @@ body {
   .nav-link {
     @apply text-xs tracking-[0.2em] uppercase text-vbrown-charcoal/70 hover:text-vbrown-gold transition-colors;
   }
+  .nav-link-light {
+    @apply text-xs tracking-[0.2em] uppercase text-vbrown-cream/65 hover:text-vbrown-gold transition-colors;
+  }
   .btn-classic {
     @apply inline-flex items-center justify-center px-8 py-3 bg-vbrown-charcoal text-vbrown-cream text-xs tracking-[0.25em] uppercase hover:bg-vbrown-ink transition-colors;
   }
