@@ -77,9 +77,12 @@ export function quoteShipping(opts: {
   const bottles = Math.max(1, opts.bottleCount);
   const weightKg = bottleWeightKg(bottles);
   const service = opts.service ?? 'standard';
-  const remote =
+  const remote = Boolean(
     opts.region === 'za_remote' ||
-    (opts.region === 'za_national' && opts.province && SA_REMOTE_PROVINCES.has(opts.province));
+      (opts.region === 'za_national' &&
+        opts.province != null &&
+        SA_REMOTE_PROVINCES.has(opts.province)),
+  );
 
   if (opts.region.startsWith('intl_')) {
     const amountZar = intlRate(opts.region, weightKg);
