@@ -39,7 +39,7 @@ export default function Hero(_props: Props) {
               animate="show"
               className="text-vbrown-cream/50 text-[10px] sm:text-xs tracking-[0.45em] uppercase mb-4"
             >
-              Signature scent · VV Brown Fragrances
+              VV Brown Fragrances
             </motion.p>
             <motion.h1
               custom={1}
@@ -48,7 +48,7 @@ export default function Hero(_props: Props) {
               animate="show"
               className="font-display text-4xl sm:text-5xl lg:text-[3.25rem] text-vbrown-cream leading-[1.08] mb-5"
             >
-              {FRAGRANCE_COPY.patron.title}
+              Elegant scents for those who lead.
             </motion.h1>
             <motion.p
               custom={2}
@@ -57,20 +57,17 @@ export default function Hero(_props: Props) {
               animate="show"
               className="text-vbrown-cream/65 text-sm sm:text-base max-w-md leading-relaxed mb-8"
             >
-              {FRAGRANCE_COPY.patron.body}
+              Sophisticated eau de parfum for women and men. Minimal. Classic. Unforgettable.
             </motion.p>
             <motion.div custom={3} variants={fadeUp} initial="hidden" animate="show" className="flex flex-wrap gap-3">
-              <Link
-                href={`/product/${FRAGRANCE_PRODUCT_IDS.patron}`}
-                className="btn-classic bg-vbrown-cream text-vbrown-charcoal hover:bg-white"
-              >
-                Shop Patron
+              <Link href="/shop" className="btn-classic bg-vbrown-cream text-vbrown-charcoal hover:bg-white">
+                Shop fragrances
               </Link>
               <Link
-                href={`/product/${FRAGRANCE_PRODUCT_IDS.femmeDuPatron}`}
+                href="/#collections"
                 className="btn-outline border-vbrown-cream/30 text-vbrown-cream hover:border-vbrown-cream"
               >
-                Femme du Patron
+                The collection
               </Link>
             </motion.div>
           </div>
@@ -88,8 +85,8 @@ export default function Hero(_props: Props) {
                 className="relative w-full max-w-2xl mx-auto"
               >
                 <Image
-                  src={BRAND_IMAGES.heroPatron}
-                  alt="Patron — VV Brown Fragrances eau de parfum for men"
+                  src={BRAND_IMAGES.heroMadame}
+                  alt="VV Brown Fragrances — luxury eau de parfum"
                   width={900}
                   height={1125}
                   priority
