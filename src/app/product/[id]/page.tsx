@@ -38,6 +38,7 @@ export default function ProductPage() {
   const images = product.images?.length ? product.images : product.image_url ? [product.image_url] : [];
 
   function handleBuyNow() {
+    if (!product) return;
     replaceCart(product, { quantity: qty });
     router.push('/cart?checkout=1');
   }
